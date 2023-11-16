@@ -9,7 +9,7 @@ def get_sp500_tickers():
     url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
     table = pd.read_html(url, header=0)[0]  # Read the first table found
     tickers = table['Symbol'].tolist()
-    tickers.append('^GSPC')
+    tickers.append('^GSPC') #add in S&P500
     tickers = [ticker.replace('.', '-') for ticker in tickers]
     return tickers
 

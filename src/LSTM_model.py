@@ -17,7 +17,7 @@ backcandles = 30
 np.random.seed(10)
 
 
-file_path = '../data/indicators/snp500_data_set.csv'
+file_path = '../data/indicators/snp500_data_set_LSTM.csv'
 snp500_data_set = pd.read_csv(file_path)
 pd.set_option('display.max_columns', None)
 
@@ -81,3 +81,7 @@ plt.plot(y_test, color = 'black', label = 'Test')
 plt.plot(y_pred, color = 'green', label = 'Prediction')
 plt.legend()
 plt.show()
+
+
+#callman filter 
+

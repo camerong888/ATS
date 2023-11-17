@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import pandas_ta as ta
 import os
+from finta import TA
 
 startDate = "2021-01-01"
 endDate = "2023-11-01"
@@ -55,33 +56,44 @@ def save_data(df, filename, directory="data/stocks"):
     # Save the file
     df.to_csv(file_path)
 
+def LSTM_csv_generation(ticker):
+    snp500_data = yf.download(ticker, start=startDate, end=endDate)
+    snp500_data["RSI"] = ta.rsi(snp500_data.Close, length=15)
+    snp500_data["EMAF"] = ta.ema(snp500_data.Close, length=20)
+    snp500_data["EMAM"] = ta.ema(snp500_data.Close, length=100)
+    snp500_data["EMAS"] = ta.ema(snp500_data.Close, length=150)
+    snp500_data["Target"] = snp500_data["Adj Close"] - snp500_data.Open
+    snp500_data["Target"] = snp500_data["Target"].shift(-1)
+    snp500_data["TargetClass"] = [
+        1 if snp500_data.Target[i] > 0 else 0 for i in range(len(snp500_data))
+    ]
+    snp500_data["TargetNextClose"] = snp500_data["Adj Close"].shift(-1)
+    snp500_data.dropna(inplace=True)
+    snp500_data.reset_index(inplace=True)
+    snp500_data.drop(["Volume", "Close", "Date"], axis=1, inplace=True)
+    snp500_data_set = snp500_data.iloc[:, 0:11]  # .values
+    save_data(snp500_data_set, f"{ticker}_data_set_LSTM.csv", directory="data/indicators")
+
+def XGBOOST_csv_generation(ticker):
+    df = yf.download(ticker, '2017-01-01', '2021-12-20')
+    df['SMA200'] = TA.SMA(df, 200)
+    df['RSI'] = TA.RSI(df)
+    df['ATR'] = TA.ATR(df)
+    df['BBWidth'] = TA.BBWIDTH(df)
+    df['Williams'] = TA.WILLIAMS(df)
+    df = df.iloc[200:, :]
+    df['target'] = df.Close.shift(-1)
+    df.dropna(inplace=True)
+    save_data(df, f"{ticker}_data_set_XGBOOST.csv", directory="data/indicators")
 
 # Fetch data
 # top500_stock_tickers = get_sp500_tickers()
 # download_data(top500_stock_tickers, startDate, endDate)
 
 # Generate indicator data
+LSTM_csv_generation(ticker="^GSPC")
+XGBOOST_csv_generation(ticker="^GSPC")
 
-# Adding indicators
-snp500_data = yf.download(tickers="^GSPC", start=startDate, end=endDate)
-snp500_data["RSI"] = ta.rsi(snp500_data.Close, length=15)
-snp500_data["EMAF"] = ta.ema(snp500_data.Close, length=20)
-snp500_data["EMAM"] = ta.ema(snp500_data.Close, length=100)
-snp500_data["EMAS"] = ta.ema(snp500_data.Close, length=150)
 
-snp500_data["Target"] = snp500_data["Adj Close"] - snp500_data.Open
-snp500_data["Target"] = snp500_data["Target"].shift(-1)
 
-snp500_data["TargetClass"] = [
-    1 if snp500_data.Target[i] > 0 else 0 for i in range(len(snp500_data))
-]
 
-snp500_data["TargetNextClose"] = snp500_data["Adj Close"].shift(-1)
-
-snp500_data.dropna(inplace=True)
-snp500_data.reset_index(inplace=True)
-snp500_data.drop(["Volume", "Close", "Date"], axis=1, inplace=True)
-
-snp500_data_set = snp500_data.iloc[:, 0:11]  # .values
-
-save_data(snp500_data_set, "snp500_data_set.csv", directory="data/indicators")

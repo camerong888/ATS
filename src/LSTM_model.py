@@ -12,12 +12,12 @@ from sklearn.metrics import mean_squared_error
 
 # Hyperparameters
 backcandles = 30
-
+ticker = '^GSPC'
 
 np.random.seed(10)
 
 
-file_path = '../data/indicators/snp500_data_set_LSTM.csv'
+file_path = f'../data/indicators/{ticker}_data_set_LSTM.csv'
 snp500_data_set = pd.read_csv(file_path)
 pd.set_option('display.max_columns', None)
 

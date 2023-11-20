@@ -4,7 +4,9 @@ import pandas_ta as ta
 import os
 from finta import TA
 
-startDate = "2021-01-01"
+# Hyperparameters
+ticker = '^GSPC'
+startDate = "2000-01-01"
 endDate = "2023-11-01"
 
 
@@ -16,13 +18,43 @@ def get_sp500_tickers():
     tickers = [ticker.replace(".", "-") for ticker in tickers]
     return tickers
 
+# CBOE Volatility Index (^VIX)
+def addVIX(df):
+    VIX_data = yf.download("^VIX", start=startDate, end=endDate)
+    df["^VIX_Close"] = VIX_data["Close"]
+    return df
 
-def download_data(tickers, start_date, end_date):
+# United States Oil Fund, LP (USO)
+def addUSO(df):
+    USO_data = yf.download("USO", start=startDate, end=endDate)
+    df["USO_Close"] = USO_data["Close"]
+    return df
+
+# CBOE Interest Rate 10 Year T No (^TNX)
+def addTNX(df):
+    TNX_data = yf.download("^TNX", start=startDate, end=endDate)
+    df["^TNX_Close"] = TNX_data["Close"]
+    return df
+
+# Energy Select Sector SPDR Fund (XLE)
+def addXLE(df):
+    XLE_data = yf.download("XLE", start=startDate, end=endDate)
+    df["XLE_Close"] = XLE_data["Close"]
+    return df
+
+# CBOE Interest Rate 10 Year T No (^TNX)
+def addSSE(df):
+    SSE_data = yf.download("000001.SS", start=startDate, end=endDate)
+    df["SSE_Close"] = SSE_data["Close"]
+    return df
+
+
+def download_data(tickers):
     failed_tickers = []
 
     for ticker in tickers:
         try:
-            ticker_data = yf.download(ticker, start=start_date, end=end_date)
+            ticker_data = yf.download(ticker, start=startDate, end=endDate)
             save_data(
                 ticker_data,
                 f"{ticker}.csv",
@@ -75,25 +107,62 @@ def LSTM_csv_generation(ticker):
     save_data(snp500_data_set, f"{ticker}_data_set_LSTM.csv", directory="data/indicators")
 
 def XGBOOST_csv_generation(ticker):
-    df = yf.download(ticker, '2017-01-01', '2021-12-20')
+    df = yf.download(ticker, start=startDate, end=endDate)
+    df['SMA10'] = TA.SMA(df, 10)
+    df['SMA20'] = TA.SMA(df, 20)
+    df['SMA30'] = TA.SMA(df, 30)
+    df['SMA50'] = TA.SMA(df, 50)
     df['SMA200'] = TA.SMA(df, 200)
+    df['SMA10_derivative'] = df['SMA10'].diff()
+    df['SMA20_derivative'] = df['SMA20'].diff()
+    df['SMA30_derivative'] = df['SMA30'].diff()
+    df['SMA50_derivative'] = df['SMA50'].diff()
+    df['SMA200_derivative'] = df['SMA200'].diff()
+    df['EMA10'] = TA.EMA(df, 10)
+    df['EMA20'] = TA.EMA(df, 20)
+    df['EMA30'] = TA.EMA(df, 30)
+    df['EMA50'] = TA.EMA(df, 50)
+    df['EMA10_derivative'] = df['EMA10'].diff()
+    df['EMA20_derivative'] = df['EMA20'].diff()
+    df['EMA30_derivative'] = df['EMA30'].diff()
+    df['EMA50_derivative'] = df['EMA50'].diff()
     df['RSI'] = TA.RSI(df)
     df['ATR'] = TA.ATR(df)
     df['BBWidth'] = TA.BBWIDTH(df)
     df['Williams'] = TA.WILLIAMS(df)
+    df['MACD'] = TA.MACD(df)['MACD']
+    df['VWAP'] = ta.vwap(df.High, df.Low, df.Close, df.Volume)
+    df['StochasticOscillator'] = TA.STOCH(df)
+    df['CCI'] = TA.CCI(df)
+    df['OBV'] = TA.OBV(df)
+    df['ParabolicSAR'] = TA.SAR(df)
+    df["AO"] = ta.ao(df.High, df.Low)
+    df["MOM"] = ta.mom(df.Close, length=16)
+    df["BOP"] = ta.bop(df.Open, df.High, df.Low, df.Close, length=16)
+    df["RVI"] = ta.rvi(df.Close)
+    a = ta.dm(df.High, df.Low, length=16)
+    df = df.join(a)
+    a = ta.macd(df.Close)
+    df = df.join(a)
+    a = ta.stoch(df.High, df.Low, df.Close)
+    df = df.join(a)
+    a = ta.stochrsi(df.Close, length=16)
+    df = df.join(a)
+
+    df = addVIX(df)
+    df = addTNX(df)
+    df = addUSO(df)
+    df = addXLE(df)
+    df = addSSE(df)
+
     df = df.iloc[200:, :]
-    df['target'] = df.Close.shift(-1)
+    df['Target'] = df.Close.shift(-1)
     df.dropna(inplace=True)
     save_data(df, f"{ticker}_data_set_XGBOOST.csv", directory="data/indicators")
+
 
 # Fetch data
 # top500_stock_tickers = get_sp500_tickers()
 # download_data(top500_stock_tickers, startDate, endDate)
-
-# Generate indicator data
-LSTM_csv_generation(ticker="^GSPC")
-XGBOOST_csv_generation(ticker="^GSPC")
-
-
-
-
+#LSTM_csv_generation(ticker=f"ticker")
+XGBOOST_csv_generation(ticker)

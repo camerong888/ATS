@@ -3,9 +3,12 @@ import pandas as pd
 import pandas_ta as ta
 import os
 from finta import TA
+from LevelBreakOut_Strategy import PriceBreakoutStrategy
 
 # Hyperparameters
 ticker = '^GSPC'
+backcandles = 40
+window=6
 startDate = "2000-01-01"
 endDate = "2023-11-01"
 
@@ -88,7 +91,7 @@ def save_data(df, filename, directory="data/stocks"):
     # Save the file
     df.to_csv(file_path)
 
-def LSTM_csv_generation(ticker):
+def LSTM_csv_generation():
     snp500_data = yf.download(ticker, start=startDate, end=endDate)
     snp500_data["RSI"] = ta.rsi(snp500_data.Close, length=15)
     snp500_data["EMAF"] = ta.ema(snp500_data.Close, length=20)
@@ -106,8 +109,9 @@ def LSTM_csv_generation(ticker):
     snp500_data_set = snp500_data.iloc[:, 0:11]  # .values
     save_data(snp500_data_set, f"{ticker}_data_set_LSTM.csv", directory="data/indicators")
 
-def XGBOOST_csv_generation(ticker):
+def XGBOOST_csv_generation():
     df = yf.download(ticker, start=startDate, end=endDate)
+
     df['SMA10'] = TA.SMA(df, 10)
     df['SMA20'] = TA.SMA(df, 20)
     df['SMA30'] = TA.SMA(df, 30)
@@ -154,10 +158,26 @@ def XGBOOST_csv_generation(ticker):
     df = addUSO(df)
     df = addXLE(df)
     df = addSSE(df)
+    
+    strategy_results = PriceBreakoutStrategy(df=df, backcandles=backcandles, window=window, showGraph = True)
+    df.rename(columns={
+        'open': 'Open',
+        'high': 'High',
+        'low': 'Low',
+        'close': 'Close',
+        'volume': 'Volume'
+    }, inplace=True)
+    # print(strategy_results)
+    df = df.iloc[1:]
+    strategy_results.index = df.index
+    df = df.join(strategy_results)
+    # print(df)
 
     df = df.iloc[200:, :]
     df['Target'] = df.Close.shift(-1)
     df.dropna(inplace=True)
+    # print(df)
+
     save_data(df, f"{ticker}_data_set_XGBOOST.csv", directory="data/indicators")
 
 
@@ -165,4 +185,4 @@ def XGBOOST_csv_generation(ticker):
 # top500_stock_tickers = get_sp500_tickers()
 # download_data(top500_stock_tickers, startDate, endDate)
 #LSTM_csv_generation(ticker=f"ticker")
-XGBOOST_csv_generation(ticker)
+XGBOOST_csv_generation()

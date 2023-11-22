@@ -59,6 +59,9 @@ class PandasDataWithPredictions(bt.feeds.PandasData):
         "uso_close",
         "xle_close",
         "sse_close",
+        "emasignal",
+        "ispivot",
+        "pattern_detected",
         "target",
         "predicted",
     )
@@ -70,13 +73,27 @@ class PandasDataWithPredictions(bt.feeds.PandasData):
         ("adj_close", -1),
         ("volume", -1),
         ("sma10", -1),
+        ("sma20", -1),
+        ("sma30", -1),
         ("sma50", -1),
         ("sma200", -1),
+        ("sma10_derivative", -1),
+        ("sma20_derivative", -1),
+        ("sma30_derivative", -1),
+        ("sma50_derivative", -1),
+        ("sma200_derivative", -1),
+        ("ema10", -1),
+        ("ema20", -1),
+        ("ema30", -1),
+        ("ema50", -1),
+        ("ema10_derivative", -1),
+        ("ema20_derivative", -1),
+        ("ema30_derivative", -1),
+        ("ema50_derivative", -1),
         ("rsi", -1),
         ("atr", -1),
         ("bbwidth", -1),
         ("williams", -1),
-        ("ema", -1),
         ("macd", -1),
         ("vwap", -1),
         ("stochasticoscillator", -1),
@@ -101,6 +118,9 @@ class PandasDataWithPredictions(bt.feeds.PandasData):
         ("uso_close", -1),
         ("xle_close", -1),
         ("sse_close", -1),
+        ("emasignal", -1),
+        ("ispivot", -1),
+        ("pattern_detected", -1),
         ("target", -1),
         ("predicted", -1),
     )
@@ -140,7 +160,7 @@ class XGBStrategy(bt.Strategy):
                 self.buyprice = current_price  # Store the price at which we bought
                 self.half_sold = False
                 self.bought = True
-                # print("Bought")
+                print("Bought")
         else:
             if (
                 self.bought
@@ -150,7 +170,7 @@ class XGBStrategy(bt.Strategy):
                 # print(f"Broker cash before sell: {self.broker.get_cash()}")
                 self.sell(size=self.order_size / 2)  # Sell half the position
                 self.half_sold = True
-                # print("Sold half at partial profit")
+                print("Sold half at partial profit")
             elif (
                 self.bought
                 and not self.half_sold
@@ -159,13 +179,13 @@ class XGBStrategy(bt.Strategy):
                 # print(f"Broker cash before sell: {self.broker.get_cash()}")
                 self.sell(size=self.order_size)  # Sell the position
                 self.bought = False
-                # print("Sold at full loss")
+                print("Sold at full loss")
 
             if self.bought and self.half_sold and current_price < self.buyprice:
                 # print(f"Broker cash before sell: {self.broker.get_cash()}")
                 self.sell(size=self.order_size / 2)  # Full sell at adjusted stop loss
                 self.bought = False
-                # print("Sold at adjusted stop loss")
+                print("Sold at adjusted stop loss")
             elif (
                 self.bought
                 and self.half_sold
@@ -174,7 +194,7 @@ class XGBStrategy(bt.Strategy):
                 # print(f"Broker cash before sell: {self.broker.get_cash()}")
                 self.sell(size=self.order_size / 2)  # Full sell at take profit
                 self.bought = False
-                # print("Sold at full profit")
+                print("Sold at full profit")
 
     def calculate_order_size(self, stop_price):
         # print(f"Broker cash: {self.broker.get_cash()}")
@@ -194,10 +214,11 @@ class XGBStrategy(bt.Strategy):
 
 def run_backtest(
     global_price_change_threshold,
+    global_profit_loss_ratio,
     global_take_profit,
-    global_stop_loss,
     global_risk_percentage,
     initialInvestment,
+    showPlot = False
 ):
     # Initialize the backtrader engine
     cerebro = bt.Cerebro()
@@ -209,7 +230,7 @@ def run_backtest(
     cerebro.addstrategy(
         XGBStrategy,
         price_change_threshold=global_price_change_threshold,
-        stop_loss=global_stop_loss,
+        stop_loss=global_take_profit / global_profit_loss_ratio,
         take_profit=global_take_profit,
         risk_percent=global_risk_percentage,
     )
@@ -224,11 +245,12 @@ def run_backtest(
     backtest_result = cerebro.run()
     final_value = cerebro.broker.getvalue()
     print(
-        f"Final Portfolio Value: {final_value} for Threshold: {global_price_change_threshold}, Take Profit: {global_take_profit}, Stop Loss: {global_stop_loss}"
+        f"Final Portfolio Value: {final_value} for Threshold: {global_price_change_threshold}, Take Profit: {global_take_profit}, Profit Loss Ratio: {global_profit_loss_ratio}"
     )
 
     # Plot the results
-    # cerebro.plot()
+    if showPlot:
+        cerebro.plot()
 
     return final_value
 
@@ -237,6 +259,7 @@ def run_backtest(
 ticker = "^GSPC"
 percentage_split = 0.2
 initalInvestment = 100000
+runLoop = False
 
 # Load full data to extract dates
 file_path = f"../data/indicators/{ticker}_data_set_XGBOOST.csv"
@@ -258,50 +281,67 @@ data = PandasDataWithPredictions(
     dataname=backtest_data_with_predictions, adj_close="Adj Close"
 )
 
-# Loop to find optimal parameters
-results = []
-numLoops = 500
-for member in range(numLoops):
-    global_risk_percentage = 0.999
-    global_price_change_threshold = random.uniform(0.001, 0.015)
-    global_take_profit = random.uniform(0.02, 0.3)  # Random value between 0.1 and 0.3
-    global_stop_loss = random.uniform(0.02, 0.2)  # Random value between 0.05 and 0.15
+if runLoop:
+    # Loop to find optimal parameters
+    results = []
+    numLoops = 500
+    for member in range(numLoops):
+        global_risk_percentage = 0.999
+        global_price_change_threshold = random.uniform(
+            0.001, 0.01
+        )  # Random value for testing
+        global_take_profit = random.uniform(0.01, 0.2)  # Random value for testing
+        global_profit_loss_ratio = random.uniform(1, 2.5)
 
+        final_value = run_backtest(
+            global_price_change_threshold,
+            global_profit_loss_ratio,
+            global_take_profit,
+            global_risk_percentage,
+            initalInvestment,
+        )
+
+        results.append(
+            {
+                "price_change_threshold": global_price_change_threshold,
+                "profit_loss_ratio": global_profit_loss_ratio,
+                "take_profit": global_take_profit,
+                "risk_percent": global_risk_percentage,
+                "final_value": final_value,
+            }
+        )
+
+    sorted_results = sorted(results, key=lambda x: x["final_value"], reverse=True)
+
+    # Print out the top 5 results
+    print("Top 5 Backtest Results:")
+    for result in sorted_results[:5]:
+        print(
+            f"Threshold: {result['price_change_threshold']:.4f}, "
+            f"Profit Loss Ratio: {result['profit_loss_ratio']:.4f}, "
+            f"Take Profit: {result['take_profit']:.4f}, "
+            f"Risk: {result['risk_percent']:.4f}, "
+            f"Final Value: {result['final_value']:.2f}"
+        )
+else:
+    global_risk_percentage = 0.999
+    global_price_change_threshold = 0.0075
+    global_take_profit = 0.02
+    global_profit_loss_ratio = 2.0
     final_value = run_backtest(
         global_price_change_threshold,
+        global_profit_loss_ratio,
         global_take_profit,
-        global_stop_loss,
         global_risk_percentage,
         initalInvestment,
+        showPlot = True
     )
 
-    results.append(
-        {
-            "price_change_threshold": global_price_change_threshold,
-            "take_profit": global_take_profit,
-            "stop_loss": global_stop_loss,
-            "risk_percent": global_risk_percentage,
-            "final_value": final_value,
-        }
-    )
-
-sorted_results = sorted(results, key=lambda x: x["final_value"], reverse=True)
-
-# Print out the top 5 results
-print("Top 5 Backtest Results:")
-for result in sorted_results[:5]:
-    print(
-        f"Threshold: {result['price_change_threshold']:.4f}, "
-        f"Profit: {result['take_profit']:.4f}, "
-        f"Loss: {result['stop_loss']:.4f}, "
-        f"Risk: {result['risk_percent']:.4f}, "
-        f"Final Value: {result['final_value']:.2f}"
-    )
 
 
 # support and resistance and engulfing pattern
 # Last 4-8 weeks
-# automate it to have parameters update every sunday for next week 
+# automate it to have parameters update every sunday for next week
 # classify trends using moving averages, candles above or below moving average
 # 5 minutes is too noisy too difficult
 # 4 hours and daily timeframes are optimal

@@ -22,7 +22,7 @@ percentage_split = 0.2
 Regression_Model = False  # False for Classification Model, True for Regression Model
 gridSearch = True  # False for Random Search, True for Grid Params
 num_fits = 5000  # Num of Random Search attempts * 5
-save_best_params = False  # True if want to save best params to a JSON file
+save_results = True  # True if want to save best params to a JSON file
 
 regression_grid_params = {
     "subsample": [0.4],
@@ -36,12 +36,12 @@ regression_grid_params = {
     "colsample_bytree": [0.35],
 }
 classification_grid_params = {
-    "subsample": [0.5],#[0.2],
+    "subsample": [0.5],  # [0.2],
     "reg_lambda": [1],
     "reg_alpha": [1.5],
     "n_estimators": [100, 150, 200, 400],
     "min_child_weight": [5, 15],
-    "max_depth": [3, 4, 5, 6, 7, 8 ,9, 10],
+    "max_depth": [3, 4, 5, 6, 7, 8, 9, 10],
     "learning_rate": [0.1, 0.2, 0.3],
     "gamma": [4.0, 2.0],
     "colsample_bytree": [0.5],
@@ -65,118 +65,118 @@ attributes_with_Categories = {
     # "Close": "q", #
     # "Volume":"q", #
     "Adj Close": "q",
-    "High - Low":"q",
+    "High - Low": "q",
     # "SMA10": "q", #
-    "SMA20":"q", # 
-    "SMA30": "q", #
-    "SMA50": "q", #
-    "SMA200": "q", #
+    "SMA20": "q",  #
+    "SMA30": "q",  #
+    "SMA50": "q",  #
+    "SMA200": "q",  #
     # "SMA10_derivative":"q", #
-    "SMA20_derivative":"q", 
-    "SMA30_derivative":"q", #
-    "SMA50_derivative":"q",
-    "SMA200_derivative":"q",
+    "SMA20_derivative": "q",
+    "SMA30_derivative": "q",  #
+    "SMA50_derivative": "q",
+    "SMA200_derivative": "q",
     # "EMA10": "q", #
-    "EMA20":"q", #
-    "EMA30": "q", #
-    "EMA50": "q", #
-    "EMA10_derivative":"q", #
-    "EMA20_derivative":"q", #
-    "EMA30_derivative":"q",
-    "EMA50_derivative":"q",
-    "RSI":"q",
-    "ATR":"q",
-    "BBWidth":"q",
+    "EMA20": "q",  #
+    "EMA30": "q",  #
+    "EMA50": "q",  #
+    "EMA10_derivative": "q",  #
+    "EMA20_derivative": "q",  #
+    "EMA30_derivative": "q",
+    "EMA50_derivative": "q",
+    "RSI": "q",
+    "ATR": "q",
+    "BBWidth": "q",
     # "Williams":"q", #
-    "MACDs_12_26_9":"q",
-    "MACD":"q",
-    "VWAP": "q", #
-    "StochasticOscillator":"q",
-    "CCI":"q",
+    "MACDs_12_26_9": "q",
+    "MACD": "q",
+    "VWAP": "q",  #
+    "StochasticOscillator": "q",
+    "CCI": "q",
     "OBV": "q",
     "ParabolicSAR": "q",
-    "AO":"q",
-    "MOM":"q",
-    "BOP":"q",
-    "RVI":"q",
-    "DMP_16":"q",
+    "AO": "q",
+    "MOM": "q",
+    "BOP": "q",
+    "RVI": "q",
+    "DMP_16": "q",
     "DMN_16": "q",
-    "MACD_12_26_9":"q",
-    "MACDh_12_26_9":"q",
+    "MACD_12_26_9": "q",
+    "MACDh_12_26_9": "q",
     "MACDs_12_26_9": "q",
-    "STOCHk_14_3_3":"q",
-    "STOCHd_14_3_3":"q",
-    "STOCHRSIk_16_14_3_3":"q",
-    "STOCHRSId_16_14_3_3":"q",
-    "^VIX_Close":"q",
+    "STOCHk_14_3_3": "q",
+    "STOCHd_14_3_3": "q",
+    "STOCHRSIk_16_14_3_3": "q",
+    "STOCHRSId_16_14_3_3": "q",
+    "^VIX_Close": "q",
     "^TNX_Close": "q",
     "USO_Close": "q",
-    "XLE_Close":"q",
+    "XLE_Close": "q",
     "SSE_Close": "q",
     # "EMASignal":"c", #
     "isPivot": "c",
     # "pattern_detected": "c", #
-    "CDL_2CROWS": "c", 
-    "CDL_3BLACKCROWS": "c", 
-    "CDL_3INSIDE": "c", 
-    "CDL_3LINESTRIKE": "c", 
-    "CDL_3OUTSIDE": "c", 
-    "CDL_3STARSINSOUTH": "c", 
-    "CDL_3WHITESOLDIERS": "c", 
-    "CDL_ABANDONEDBABY": "c", 
-    "CDL_ADVANCEBLOCK": "c", 
-    "CDL_BELTHOLD": "c", 
-    "CDL_BREAKAWAY": "c", 
-    "CDL_CLOSINGMARUBOZU": "c", 
-    "CDL_CONCEALBABYSWALL": "c", 
-    "CDL_COUNTERATTACK": "c", 
-    "CDL_DARKCLOUDCOVER": "c", 
-    "CDL_DOJI_10_0.1": "c", 
-    "CDL_DOJISTAR": "c", 
-    "CDL_DRAGONFLYDOJI": "c", 
-    "CDL_ENGULFING": "c", 
+    "CDL_2CROWS": "c",
+    "CDL_3BLACKCROWS": "c",
+    "CDL_3INSIDE": "c",
+    "CDL_3LINESTRIKE": "c",
+    "CDL_3OUTSIDE": "c",
+    "CDL_3STARSINSOUTH": "c",
+    "CDL_3WHITESOLDIERS": "c",
+    "CDL_ABANDONEDBABY": "c",
+    "CDL_ADVANCEBLOCK": "c",
+    "CDL_BELTHOLD": "c",
+    "CDL_BREAKAWAY": "c",
+    "CDL_CLOSINGMARUBOZU": "c",
+    "CDL_CONCEALBABYSWALL": "c",
+    "CDL_COUNTERATTACK": "c",
+    "CDL_DARKCLOUDCOVER": "c",
+    "CDL_DOJI_10_0.1": "c",
+    "CDL_DOJISTAR": "c",
+    "CDL_DRAGONFLYDOJI": "c",
+    "CDL_ENGULFING": "c",
     "CDL_EVENINGDOJISTAR": "c",
-    "CDL_EVENINGSTAR": "c", 
-    "CDL_GAPSIDESIDEWHITE": "c", 
-    "CDL_GRAVESTONEDOJI": "c", 
-    "CDL_HAMMER": "c", 
-    "CDL_HANGINGMAN": "c", 
-    "CDL_HARAMI": "c", 
-    "CDL_HARAMICROSS": "c", 
-    "CDL_HIGHWAVE": "c", 
-    "CDL_HIKKAKE": "c", 
-    "CDL_HIKKAKEMOD": "c", 
-    "CDL_HOMINGPIGEON": "c", 
-    "CDL_IDENTICAL3CROWS": "c", 
-    "CDL_INNECK": "c", 
-    "CDL_INSIDE": "c", 
-    "CDL_INVERTEDHAMMER": "c", 
-    "CDL_KICKING": "c", 
-    "CDL_KICKINGBYLENGTH": "c", 
-    "CDL_LADDERBOTTOM": "c", 
-    "CDL_LONGLEGGEDDOJI": "c", 
-    "CDL_LONGLINE": "c", 
-    "CDL_MARUBOZU": "c", 
-    "CDL_MATCHINGLOW": "c", 
-    "CDL_MATHOLD": "c", 
-    "CDL_MORNINGDOJISTAR": "c", 
-    "CDL_MORNINGSTAR": "c", 
-    "CDL_ONNECK": "c", 
-    "CDL_PIERCING": "c", 
-    "CDL_RICKSHAWMAN": "c", 
-    "CDL_RISEFALL3METHODS": "c", 
-    "CDL_SEPARATINGLINES": "c", 
-    "CDL_SHOOTINGSTAR": "c", 
-    "CDL_SHORTLINE": "c", 
-    "CDL_SPINNINGTOP": "c", 
-    "CDL_STALLEDPATTERN": "c", 
-    "CDL_STICKSANDWICH": "c", 
-    "CDL_TAKURI": "c", 
-    "CDL_TASUKIGAP": "c", 
-    "CDL_THRUSTING": "c", 
-    "CDL_TRISTAR": "c", 
+    "CDL_EVENINGSTAR": "c",
+    "CDL_GAPSIDESIDEWHITE": "c",
+    "CDL_GRAVESTONEDOJI": "c",
+    "CDL_HAMMER": "c",
+    "CDL_HANGINGMAN": "c",
+    "CDL_HARAMI": "c",
+    "CDL_HARAMICROSS": "c",
+    "CDL_HIGHWAVE": "c",
+    "CDL_HIKKAKE": "c",
+    "CDL_HIKKAKEMOD": "c",
+    "CDL_HOMINGPIGEON": "c",
+    "CDL_IDENTICAL3CROWS": "c",
+    "CDL_INNECK": "c",
+    "CDL_INSIDE": "c",
+    "CDL_INVERTEDHAMMER": "c",
+    "CDL_KICKING": "c",
+    "CDL_KICKINGBYLENGTH": "c",
+    "CDL_LADDERBOTTOM": "c",
+    "CDL_LONGLEGGEDDOJI": "c",
+    "CDL_LONGLINE": "c",
+    "CDL_MARUBOZU": "c",
+    "CDL_MATCHINGLOW": "c",
+    "CDL_MATHOLD": "c",
+    "CDL_MORNINGDOJISTAR": "c",
+    "CDL_MORNINGSTAR": "c",
+    "CDL_ONNECK": "c",
+    "CDL_PIERCING": "c",
+    "CDL_RICKSHAWMAN": "c",
+    "CDL_RISEFALL3METHODS": "c",
+    "CDL_SEPARATINGLINES": "c",
+    "CDL_SHOOTINGSTAR": "c",
+    "CDL_SHORTLINE": "c",
+    "CDL_SPINNINGTOP": "c",
+    "CDL_STALLEDPATTERN": "c",
+    "CDL_STICKSANDWICH": "c",
+    "CDL_TAKURI": "c",
+    "CDL_TASUKIGAP": "c",
+    "CDL_THRUSTING": "c",
+    "CDL_TRISTAR": "c",
     "CDL_UNIQUE3RIVER": "c",
-    "CDL_UPSIDEGAP2CROWS": "c", 
+    "CDL_UPSIDEGAP2CROWS": "c",
     "CDL_XSIDEGAP3METHODS": "c",
 }
 
@@ -276,18 +276,12 @@ else:
             n_jobs=-1,  # Use all cores
             random_state=20,
         )
-    modl.fit(X, y, verbose = True)
+    modl.fit(X, y, verbose=True)
     print("Best parameters:", modl.best_params_)
     print("Best AUC: ", modl.best_score_)
 endTime = time.time()
 print(f"Parameter Fit Time: {(endTime-startTime)/60}")
 model = modl.best_estimator_
-
-if save_best_params:
-    best_params = modl.best_params_
-    # Save best params to a JSON file
-    with open(f"../models/{ticker}_XGBOOST_best_params.json", "w") as f:
-        json.dump(best_params, f, indent=4)
 
 
 def xgb_predict(train, val):
@@ -338,7 +332,7 @@ def validate(data, perc):
     train, test = train_test_split(data, perc)
     history = [x for x in train]
 
-    for i in tqdm(range(len(test)), desc = 'Validation'):
+    for i in tqdm(range(len(test)), desc="Validation"):
         X_test, y_test = test[i, :-1], test[i, -1]
         # print(f"Attributes: {X_test}")
         # print(f"Target: {y_test}")
@@ -365,7 +359,7 @@ if Regression_Model:
 else:
     accuracy, auc_score, y, pred, test = validate(snp500_data_set, percentage_split)
     print("Accuracy:", accuracy)
-    print("AUC:", auc_score)    
+    print("AUC:", auc_score)
 endTime = time.time()
 print(f"Prediction time: {(endTime-startTime)/60}")
 
@@ -378,11 +372,11 @@ df_TP = pd.DataFrame(test_pred, columns=plotting_attributes)
 
 plt.figure(figsize=(15, 9))
 plt.title(f"{ticker} Next Day Close Price vs. Predicted Price", fontsize=18)
-plt.plot(df_TP["Target"], label="Next day Actual Closing Price", color="cyan")
-plt.plot(df_TP["Pred"], label="Predicted Price", color="green", alpha=1)
-plt.xlabel("Date", fontsize=18)
+plt.plot(df_TP["Target"], label="Actual Next 10 Day Price Movement (Up = 1, Down = 0)", color="cyan")
+plt.plot(df_TP["Pred"], label="Predicted Next 10 Day Price Movement (Up = 1, Down = 0)", color="green", alpha=1)
+plt.xlabel("Day", fontsize=18)
 plt.legend(loc="upper left")
-plt.ylabel("Price in USD $", fontsize=18)
+plt.ylabel("Classification (10 Day Price Increase = 1, 10 Day Price Decrease = 0)", fontsize=18)
 plt.show()
 
 # After fitting the model
@@ -403,3 +397,20 @@ else:
     snp500_data_set.to_csv(
         f"../results/{ticker}_classification_predictions.csv", index=False
     )
+
+if save_results:
+    best_params = modl.best_params_
+    initial_AUC = modl.best_score_
+    final_AUC = auc_score
+    final_accuracy = accuracy
+    results_data = {
+        "Best Parameters": best_params,
+        "Initial AUC": initial_AUC,
+        "Final AUC": final_AUC,
+        "Final Accuracy": final_accuracy,
+        "Utilized Attributes": utilized_attributes
+    }
+    filename = f"../results/logs/{ticker}_XGBClassifier_result_{int(time.time())}.json"
+    with open(filename, "w") as f:
+        json.dump(results_data, f, indent=4)
+        print(f"Results saved to {filename}")

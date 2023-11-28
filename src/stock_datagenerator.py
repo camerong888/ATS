@@ -6,9 +6,9 @@ from finta import TA
 from LevelBreakOut_Strategy import PriceBreakoutStrategy
 
 # Hyperparameters
-ticker = '^GSPC'
+ticker = "^GSPC"
 backcandles = 40
-window=6
+window = 6
 startDate = "2000-01-01"
 endDate = "2023-11-01"
 
@@ -21,11 +21,13 @@ def get_sp500_tickers():
     tickers = [ticker.replace(".", "-") for ticker in tickers]
     return tickers
 
+
 # CBOE Volatility Index (^VIX)
 def addVIX(df):
     VIX_data = yf.download("^VIX", start=startDate, end=endDate)
     df["^VIX_Close"] = VIX_data["Close"]
     return df
+
 
 # United States Oil Fund, LP (USO)
 def addUSO(df):
@@ -33,17 +35,20 @@ def addUSO(df):
     df["USO_Close"] = USO_data["Close"]
     return df
 
+
 # CBOE Interest Rate 10 Year T No (^TNX)
 def addTNX(df):
     TNX_data = yf.download("^TNX", start=startDate, end=endDate)
     df["^TNX_Close"] = TNX_data["Close"]
     return df
 
+
 # Energy Select Sector SPDR Fund (XLE)
 def addXLE(df):
     XLE_data = yf.download("XLE", start=startDate, end=endDate)
     df["XLE_Close"] = XLE_data["Close"]
     return df
+
 
 # CBOE Interest Rate 10 Year T No (^TNX)
 def addSSE(df):
@@ -91,6 +96,7 @@ def save_data(df, filename, directory="data/stocks"):
     # Save the file
     df.to_csv(file_path)
 
+
 def LSTM_csv_generation():
     snp500_data = yf.download(ticker, start=startDate, end=endDate)
     snp500_data["RSI"] = ta.rsi(snp500_data.Close, length=15)
@@ -107,39 +113,42 @@ def LSTM_csv_generation():
     snp500_data.reset_index(inplace=True)
     snp500_data.drop(["Volume", "Close", "Date"], axis=1, inplace=True)
     snp500_data_set = snp500_data.iloc[:, 0:11]  # .values
-    save_data(snp500_data_set, f"{ticker}_data_set_LSTM.csv", directory="data/indicators")
+    save_data(
+        snp500_data_set, f"{ticker}_data_set_LSTM.csv", directory="data/indicators"
+    )
+
 
 def XGBOOST_regression_csv_generation():
     df = yf.download(ticker, start=startDate, end=endDate)
 
-    df['SMA10'] = TA.SMA(df, 10)
-    df['SMA20'] = TA.SMA(df, 20)
-    df['SMA30'] = TA.SMA(df, 30)
-    df['SMA50'] = TA.SMA(df, 50)
-    df['SMA200'] = TA.SMA(df, 200)
-    df['SMA10_derivative'] = df['SMA10'].diff()
-    df['SMA20_derivative'] = df['SMA20'].diff()
-    df['SMA30_derivative'] = df['SMA30'].diff()
-    df['SMA50_derivative'] = df['SMA50'].diff()
-    df['SMA200_derivative'] = df['SMA200'].diff()
-    df['EMA10'] = TA.EMA(df, 10)
-    df['EMA20'] = TA.EMA(df, 20)
-    df['EMA30'] = TA.EMA(df, 30)
-    df['EMA50'] = TA.EMA(df, 50)
-    df['EMA10_derivative'] = df['EMA10'].diff()
-    df['EMA20_derivative'] = df['EMA20'].diff()
-    df['EMA30_derivative'] = df['EMA30'].diff()
-    df['EMA50_derivative'] = df['EMA50'].diff()
-    df['RSI'] = TA.RSI(df)
-    df['ATR'] = TA.ATR(df)
-    df['BBWidth'] = TA.BBWIDTH(df)
-    df['Williams'] = TA.WILLIAMS(df)
-    df['MACD'] = TA.MACD(df)['MACD']
-    df['VWAP'] = ta.vwap(df.High, df.Low, df.Close, df.Volume)
-    df['StochasticOscillator'] = TA.STOCH(df)
-    df['CCI'] = TA.CCI(df)
-    df['OBV'] = TA.OBV(df)
-    df['ParabolicSAR'] = TA.SAR(df)
+    df["SMA10"] = TA.SMA(df, 10)
+    df["SMA20"] = TA.SMA(df, 20)
+    df["SMA30"] = TA.SMA(df, 30)
+    df["SMA50"] = TA.SMA(df, 50)
+    df["SMA200"] = TA.SMA(df, 200)
+    df["SMA10_derivative"] = df["SMA10"].diff()
+    df["SMA20_derivative"] = df["SMA20"].diff()
+    df["SMA30_derivative"] = df["SMA30"].diff()
+    df["SMA50_derivative"] = df["SMA50"].diff()
+    df["SMA200_derivative"] = df["SMA200"].diff()
+    df["EMA10"] = TA.EMA(df, 10)
+    df["EMA20"] = TA.EMA(df, 20)
+    df["EMA30"] = TA.EMA(df, 30)
+    df["EMA50"] = TA.EMA(df, 50)
+    df["EMA10_derivative"] = df["EMA10"].diff()
+    df["EMA20_derivative"] = df["EMA20"].diff()
+    df["EMA30_derivative"] = df["EMA30"].diff()
+    df["EMA50_derivative"] = df["EMA50"].diff()
+    df["RSI"] = TA.RSI(df)
+    df["ATR"] = TA.ATR(df)
+    df["BBWidth"] = TA.BBWIDTH(df)
+    df["Williams"] = TA.WILLIAMS(df)
+    df["MACD"] = TA.MACD(df)["MACD"]
+    df["VWAP"] = ta.vwap(df.High, df.Low, df.Close, df.Volume)
+    df["StochasticOscillator"] = TA.STOCH(df)
+    df["CCI"] = TA.CCI(df)
+    df["OBV"] = TA.OBV(df)
+    df["ParabolicSAR"] = TA.SAR(df)
     df["AO"] = ta.ao(df.High, df.Low)
     df["MOM"] = ta.mom(df.Close, length=16)
     df["BOP"] = ta.bop(df.Open, df.High, df.Low, df.Close, length=16)
@@ -158,15 +167,20 @@ def XGBOOST_regression_csv_generation():
     df = addUSO(df)
     df = addXLE(df)
     df = addSSE(df)
-    
-    strategy_results = PriceBreakoutStrategy(df=df, backcandles=backcandles, window=window, showGraph = False)
-    df.rename(columns={
-        'open': 'Open',
-        'high': 'High',
-        'low': 'Low',
-        'close': 'Close',
-        'volume': 'Volume'
-    }, inplace=True)
+
+    strategy_results = PriceBreakoutStrategy(
+        df=df, backcandles=backcandles, window=window, showGraph=False
+    )
+    df.rename(
+        columns={
+            "open": "Open",
+            "high": "High",
+            "low": "Low",
+            "close": "Close",
+            "volume": "Volume",
+        },
+        inplace=True,
+    )
     # print(strategy_results)
     df = df.iloc[1:]
     strategy_results.index = df.index
@@ -174,56 +188,64 @@ def XGBOOST_regression_csv_generation():
     # print(df)
 
     df = df.iloc[200:, :]
-    df['Target'] = df.Close.shift(-1)
+    df["Target"] = df.Close.shift(-1)
     df.dropna(inplace=True)
     # print(df)
 
-    save_data(df, f"{ticker}_regression_data_set_XGBOOST.csv", directory="data/indicators")
+    save_data(
+        df, f"{ticker}_regression_data_set_XGBOOST.csv", directory="data/indicators"
+    )
+
 
 def create_categorical_target_column(df, prediction_window=10):
     # Shift the closing price backwards by 'prediction_window' days
-    future_close = df['Close'].shift(-prediction_window)
+    future_close = df["Close"].shift(-prediction_window)
 
     # Compare future closing price with the current closing price
-    df['Target'] = (future_close > df['Close']).astype(int)
+    df["Target"] = (future_close > df["Close"]).astype(int)
 
     # Drop the last 'prediction_window' rows as they won't have future data
     df = df[:-prediction_window]
     # print(df['Target'])
 
-    return df['Target']
+    return df["Target"]
 
-def XGBOOST_classification_csv_generation(prediction_window = 10):
+
+def XGBOOST_classification_csv_generation(prediction_window=10):
     df = yf.download(ticker, start=startDate, end=endDate)
 
-    df['SMA10'] = TA.SMA(df, 10)
-    df['SMA20'] = TA.SMA(df, 20)
-    df['SMA30'] = TA.SMA(df, 30)
-    df['SMA50'] = TA.SMA(df, 50)
-    df['SMA200'] = TA.SMA(df, 200)
-    df['SMA10_derivative'] = df['SMA10'].diff()
-    df['SMA20_derivative'] = df['SMA20'].diff()
-    df['SMA30_derivative'] = df['SMA30'].diff()
-    df['SMA50_derivative'] = df['SMA50'].diff()
-    df['SMA200_derivative'] = df['SMA200'].diff()
-    df['EMA10'] = TA.EMA(df, 10)
-    df['EMA20'] = TA.EMA(df, 20)
-    df['EMA30'] = TA.EMA(df, 30)
-    df['EMA50'] = TA.EMA(df, 50)
-    df['EMA10_derivative'] = df['EMA10'].diff()
-    df['EMA20_derivative'] = df['EMA20'].diff()
-    df['EMA30_derivative'] = df['EMA30'].diff()
-    df['EMA50_derivative'] = df['EMA50'].diff()
-    df['RSI'] = TA.RSI(df)
-    df['ATR'] = TA.ATR(df)
-    df['BBWidth'] = TA.BBWIDTH(df)
-    df['Williams'] = TA.WILLIAMS(df)
-    df['MACD'] = TA.MACD(df)['MACD']
-    df['VWAP'] = ta.vwap(df.High, df.Low, df.Close, df.Volume)
-    df['StochasticOscillator'] = TA.STOCH(df)
-    df['CCI'] = TA.CCI(df)
-    df['OBV'] = TA.OBV(df)
-    df['ParabolicSAR'] = TA.SAR(df)
+    df["High - Low"] = df["High"] - df["Low"]
+    cdl_patterns = df.ta.cdl_pattern(name="all")
+    print(f"CDL PAT: {cdl_patterns}")
+    df = df.join(cdl_patterns)
+    df["SMA10"] = TA.SMA(df, 10)
+    df["SMA20"] = TA.SMA(df, 20)
+    df["SMA30"] = TA.SMA(df, 30)
+    df["SMA50"] = TA.SMA(df, 50)
+    df["SMA200"] = TA.SMA(df, 200)
+    df["SMA10_derivative"] = df["SMA10"].diff()
+    df["SMA20_derivative"] = df["SMA20"].diff()
+    df["SMA30_derivative"] = df["SMA30"].diff()
+    df["SMA50_derivative"] = df["SMA50"].diff()
+    df["SMA200_derivative"] = df["SMA200"].diff()
+    df["EMA10"] = TA.EMA(df, 10)
+    df["EMA20"] = TA.EMA(df, 20)
+    df["EMA30"] = TA.EMA(df, 30)
+    df["EMA50"] = TA.EMA(df, 50)
+    df["EMA10_derivative"] = df["EMA10"].diff()
+    df["EMA20_derivative"] = df["EMA20"].diff()
+    df["EMA30_derivative"] = df["EMA30"].diff()
+    df["EMA50_derivative"] = df["EMA50"].diff()
+    df["RSI"] = TA.RSI(df)
+    df["ATR"] = TA.ATR(df)
+    df["BBWidth"] = TA.BBWIDTH(df)
+    df["Williams"] = TA.WILLIAMS(df)
+    df["MACD"] = TA.MACD(df)["MACD"]
+    df["VWAP"] = ta.vwap(df.High, df.Low, df.Close, df.Volume)
+    df["StochasticOscillator"] = TA.STOCH(df)
+    df["CCI"] = TA.CCI(df)
+    df["OBV"] = TA.OBV(df)
+    df["ParabolicSAR"] = TA.SAR(df)
     df["AO"] = ta.ao(df.High, df.Low)
     df["MOM"] = ta.mom(df.Close, length=16)
     df["BOP"] = ta.bop(df.Open, df.High, df.Low, df.Close, length=16)
@@ -242,15 +264,20 @@ def XGBOOST_classification_csv_generation(prediction_window = 10):
     df = addUSO(df)
     df = addXLE(df)
     df = addSSE(df)
-    
-    strategy_results = PriceBreakoutStrategy(df=df, backcandles=backcandles, window=window, showGraph = False)
-    df.rename(columns={
-        'open': 'Open',
-        'high': 'High',
-        'low': 'Low',
-        'close': 'Close',
-        'volume': 'Volume'
-    }, inplace=True)
+
+    strategy_results = PriceBreakoutStrategy(
+        df=df, backcandles=backcandles, window=window, showGraph=False
+    )
+    df.rename(
+        columns={
+            "open": "Open",
+            "high": "High",
+            "low": "Low",
+            "close": "Close",
+            "volume": "Volume",
+        },
+        inplace=True,
+    )
     # print(strategy_results)
     df = df.iloc[1:]
     strategy_results.index = df.index
@@ -258,20 +285,23 @@ def XGBOOST_classification_csv_generation(prediction_window = 10):
     # print(df)
 
     df = df.iloc[200:, :]
-    df['Target'] = create_categorical_target_column(df,prediction_window)
-    df['Target']=df['Target'].astype("category")
+    df["Target"] = create_categorical_target_column(df, prediction_window)
+    df["Target"] = df["Target"].astype("category")
     df.dropna(inplace=True)
     # print(df)
 
-    save_data(df, f"{ticker}_classification_data_set_XGBOOST.csv", directory="data/indicators")
+    save_data(
+        df, f"{ticker}_classification_data_set_XGBOOST.csv", directory="data/indicators"
+    )
+
 
 # Fetch data
 # top500_stock_tickers = get_sp500_tickers()
 # download_data(top500_stock_tickers, startDate, endDate)
-#LSTM_csv_generation(ticker=f"ticker")
+# LSTM_csv_generation(ticker=f"ticker")
 # XGBOOST_regression_csv_generation()
 
-XGBOOST_classification_csv_generation(prediction_window = 10)
+XGBOOST_classification_csv_generation(prediction_window=10)
 
 # Add daily spread
-# 
+#

@@ -32,3 +32,6 @@ When you are done, deactivate the virtual environment by running:
 
 deactivate
 
+If you add a python module do: 
+
+pip freeze > requirements.txt

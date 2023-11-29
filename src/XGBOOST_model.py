@@ -20,8 +20,9 @@ percentage_split = 0.2
 
 # Choose Model Parameters:
 Regression_Model = False  # False for Classification Model, True for Regression Model
-gridSearch = True  # False for Random Search, True for Grid Params
-num_fits = 5000  # Num of Random Search attempts * 5
+
+gridSearch = False  # False for Random Search, True for Grid Params
+num_fits = 2500  # Num of Random Search attempts * 5
 save_results = True  # True if want to save best params to a JSON file
 
 regression_grid_params = {
@@ -47,15 +48,15 @@ classification_grid_params = {
     "colsample_bytree": [0.5],
 }
 random_params = {
-    "max_depth": np.arange(2, 5, 1),
+    "max_depth": np.arange(2, 10, 1),
     "learning_rate": np.arange(0.01, 0.3, 0.01),
-    "n_estimators": np.arange(100, 1200, 50),
-    "colsample_bytree": np.arange(0.3, 1, 0.05),
+    "n_estimators": np.arange(50, 1000, 50),
+    "colsample_bytree": np.arange(0.3, 0.9, 0.05),
     "subsample": np.arange(0.3, 0.9, 0.05),
     "gamma": np.arange(0, 5, 0.5),
-    "min_child_weight": np.arange(3, 15, 1),
-    "reg_alpha": np.arange(0, 2, 0.05),  # L1 regularization
-    "reg_lambda": np.arange(0, 2, 0.05),  # L2 regularization
+    "min_child_weight": np.arange(2, 10, 1),
+    "reg_alpha": np.arange(0, 10, 0.5),  # L1 regularization
+    "reg_lambda": np.arange(0, 1, 0.05),  # L2 regularization
 }
 
 attributes_with_Categories = {
@@ -228,7 +229,7 @@ if Regression_Model:
             estimator=xgb_model,
             param_grid=regression_grid_params,
             scoring="neg_mean_squared_error",
-            verbose=1,
+            verbose=10,
             cv=5,
             n_jobs=-1,  # Use all cores
         )
@@ -238,10 +239,10 @@ if Regression_Model:
             param_distributions=random_params,
             n_iter=num_fits,  # Number of parameter settings sampled
             scoring="neg_mean_squared_error",
-            verbose=1,
+            verbose=10,
             cv=5,
             n_jobs=-1,  # Use all cores
-            random_state=20,
+            random_state=int(time.time()),
         )
     modl.fit(X, y)
     print("Best parameters:", modl.best_params_)
@@ -274,7 +275,7 @@ else:
             verbose=10,
             cv=5,
             n_jobs=-1,  # Use all cores
-            random_state=20,
+            random_state=int(time.time()),
         )
     modl.fit(X, y, verbose=True)
     print("Best parameters:", modl.best_params_)
@@ -399,18 +400,24 @@ else:
     )
 
 if save_results:
-    best_params = modl.best_params_
-    initial_AUC = modl.best_score_
-    final_AUC = auc_score
-    final_accuracy = accuracy
+    best_params = {k: int(v) if isinstance(v, np.integer) else v for k, v in modl.best_params_.items()}
+    initial_AUC = float(modl.best_score_)
+    final_AUC = float(auc_score)
+    final_accuracy = float(accuracy)
+    feature_importances_dict = importance_series_sorted.to_dict()
     results_data = {
         "Best Parameters": best_params,
         "Initial AUC": initial_AUC,
         "Final AUC": final_AUC,
         "Final Accuracy": final_accuracy,
+        "Feature Importances": feature_importances_dict,
         "Utilized Attributes": utilized_attributes
     }
     filename = f"../results/logs/{ticker}_XGBClassifier_result_{int(time.time())}.json"
     with open(filename, "w") as f:
         json.dump(results_data, f, indent=4)
         print(f"Results saved to {filename}")
+
+
+# look into EPE
+# 

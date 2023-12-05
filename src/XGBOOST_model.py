@@ -21,8 +21,8 @@ percentage_split = 0.2
 # Choose Model Parameters:
 Regression_Model = False  # False for Classification Model, True for Regression Model
 
-gridSearch = False  # False for Random Search, True for Grid Params
-num_fits = 2500  # Num of Random Search attempts * 5
+gridSearch = True  # False for Random Search, True for Grid Params
+num_fits = 5000  # Num of Random Search attempts * 5
 save_results = True  # True if want to save best params to a JSON file
 
 regression_grid_params = {
@@ -37,26 +37,26 @@ regression_grid_params = {
     "colsample_bytree": [0.35],
 }
 classification_grid_params = {
-    "subsample": [0.5],  # [0.2],
-    "reg_lambda": [1],
-    "reg_alpha": [1.5],
-    "n_estimators": [100, 150, 200, 400],
-    "min_child_weight": [5, 15],
-    "max_depth": [3, 4, 5, 6, 7, 8, 9, 10],
-    "learning_rate": [0.1, 0.2, 0.3],
-    "gamma": [4.0, 2.0],
-    "colsample_bytree": [0.5],
+    "subsample": [0.6499999999999999],  # [0.2],
+    "reg_lambda": [0.4],
+    "reg_alpha": [0.0],
+    "n_estimators": [50],
+    "min_child_weight": [2],
+    "max_depth": [6],
+    "learning_rate": [0.3900000000000002],
+    "gamma": [0.5],
+    "colsample_bytree": [0.7],
 }
 random_params = {
-    "max_depth": np.arange(2, 10, 1),
-    "learning_rate": np.arange(0.01, 0.3, 0.01),
-    "n_estimators": np.arange(50, 1000, 50),
-    "colsample_bytree": np.arange(0.3, 0.9, 0.05),
-    "subsample": np.arange(0.3, 0.9, 0.05),
-    "gamma": np.arange(0, 5, 0.5),
+    "max_depth": np.arange(2, 7, 1),
+    "learning_rate": np.arange(0.25, 0.45, 0.01),
+    "n_estimators": np.arange(25, 525, 50),
+    "colsample_bytree": np.arange(0.4, 0.9, 0.05),
+    "subsample": np.arange(0.4, 0.9, 0.05),
+    "gamma": np.arange(0, 2, 0.2),
     "min_child_weight": np.arange(2, 10, 1),
-    "reg_alpha": np.arange(0, 10, 0.5),  # L1 regularization
-    "reg_lambda": np.arange(0, 1, 0.05),  # L2 regularization
+    "reg_alpha": np.arange(0, 1, 0.1),  # L1 regularization
+    "reg_lambda": np.arange(0, 1, 0.1),  # L2 regularization
 }
 
 attributes_with_Categories = {
@@ -371,21 +371,44 @@ plotting_attributes = utilized_attributes + ["Pred"]
 df_TP = pd.DataFrame(test_pred, columns=plotting_attributes)
 
 
+# plt.figure(figsize=(15, 9))
+# plt.title(f"{ticker} XGBOOST Classification Price Prediction", fontsize=18)
+# plt.plot(df_TP["Target"], label="Actual Next 10 Day Price Movement (Up = 1, Down = 0)", color="cyan")
+# plt.plot(df_TP["Pred"], label="Predicted Next 10 Day Price Movement (Up = 1, Down = 0)", color="green", alpha=1)
+# plt.xlabel("Day", fontsize=18)
+# plt.legend(loc="upper left")
+# plt.ylabel("Classification Label", fontsize=18)
+# plt.tight_layout()
+# plt.yticks([])
+# plt.show()
+
 plt.figure(figsize=(15, 9))
-plt.title(f"{ticker} Next Day Close Price vs. Predicted Price", fontsize=18)
-plt.plot(df_TP["Target"], label="Actual Next 10 Day Price Movement (Up = 1, Down = 0)", color="cyan")
-plt.plot(df_TP["Pred"], label="Predicted Next 10 Day Price Movement (Up = 1, Down = 0)", color="green", alpha=1)
+plt.title(f"{ticker} XGBOOST Classification Price Prediction", fontsize=18)
+plt.plot(df_TP["Adj Close"], label="Stock Price", color="blue", alpha=0.5)
+plt.scatter(df_TP.index, df_TP["Adj Close"].where((df_TP["Target"] == 1.0) & (df_TP["Pred"] == 1)), color='green', label='Actual and Predicted Up', marker='^')
+plt.scatter(df_TP.index, df_TP["Adj Close"].where((df_TP["Target"] == 0.0) & (df_TP["Pred"] == 0)), color='lime', label='Actual Down and Predicted Down', marker='v')
+plt.scatter(df_TP.index, df_TP["Adj Close"].where((df_TP["Target"] == 1.0) & (df_TP["Pred"] == 0)), color='red', label='Actual Up, Predicted Down', marker='^', alpha=0.5)
+plt.scatter(df_TP.index, df_TP["Adj Close"].where((df_TP["Target"] == 0.0) & (df_TP["Pred"] == 1)), color='darkred', label='Actual Down, Predicted Up', marker='v', alpha=0.5)
 plt.xlabel("Day", fontsize=18)
 plt.legend(loc="upper left")
-plt.ylabel("Classification (10 Day Price Increase = 1, 10 Day Price Decrease = 0)", fontsize=18)
+plt.ylabel("Stock Price ($)", fontsize=18)
+plt.tight_layout()
 plt.show()
+
 
 # After fitting the model
 feature_importances = model.feature_importances_
 importance_series = pd.Series(feature_importances, index=snp500_data_set.columns[:-1])
 importance_series_sorted = importance_series.sort_values(ascending=False)
+plt.figure(figsize=(15, 9))
 importance_series_sorted.plot(kind="bar", title="Feature Importances")
+plt.ylabel('Importance', fontsize=18)
+plt.xlabel('Features', fontsize=18)
+# plt.xticks(rotation=45, ha='right') # Rotate the feature names for better readability
+plt.xticks(rotation=90, ha='right', fontsize=10)
+plt.tight_layout() # Ensure the labels don't get cut off
 plt.show()
+
 
 n = int(len(snp500_data_set.values) * (1 - percentage_split))
 snp500_data_set = snp500_data_set[n:]
@@ -420,4 +443,3 @@ if save_results:
 
 
 # look into EPE
-# 

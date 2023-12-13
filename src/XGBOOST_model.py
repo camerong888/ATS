@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
-from xgboost import XGBRegressor, XGBClassifier
+from xgboost import XGBRegressor, XGBClassifier, plot_tree
+import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import (
     mean_squared_error,
@@ -23,6 +24,7 @@ Regression_Model = False  # False for Classification Model, True for Regression 
 
 gridSearch = True  # False for Random Search, True for Grid Params
 num_fits = 5000  # Num of Random Search attempts * 5
+folds = 5 # CV
 save_results = True  # True if want to save best params to a JSON file
 
 regression_grid_params = {
@@ -50,11 +52,11 @@ classification_grid_params = {
 random_params = {
     "max_depth": np.arange(2, 7, 1),
     "learning_rate": np.arange(0.25, 0.45, 0.01),
-    "n_estimators": np.arange(25, 525, 50),
+    "n_estimators": np.arange(25, 400, 50),
     "colsample_bytree": np.arange(0.4, 0.9, 0.05),
     "subsample": np.arange(0.4, 0.9, 0.05),
     "gamma": np.arange(0, 2, 0.2),
-    "min_child_weight": np.arange(2, 10, 1),
+    "min_child_weight": np.arange(2, 7, 1),
     "reg_alpha": np.arange(0, 1, 0.1),  # L1 regularization
     "reg_lambda": np.arange(0, 1, 0.1),  # L2 regularization
 }
@@ -230,7 +232,7 @@ if Regression_Model:
             param_grid=regression_grid_params,
             scoring="neg_mean_squared_error",
             verbose=10,
-            cv=5,
+            cv=folds,
             n_jobs=-1,  # Use all cores
         )
     else:
@@ -240,7 +242,7 @@ if Regression_Model:
             n_iter=num_fits,  # Number of parameter settings sampled
             scoring="neg_mean_squared_error",
             verbose=10,
-            cv=5,
+            cv=folds,
             n_jobs=-1,  # Use all cores
             random_state=int(time.time()),
         )
@@ -263,7 +265,7 @@ else:
             param_grid=classification_grid_params,
             scoring=auc_scorer,
             verbose=10,
-            cv=5,
+            cv=folds,
             n_jobs=-1,  # Use all cores
         )
     else:
@@ -273,7 +275,7 @@ else:
             n_iter=num_fits,  # Number of parameter settings sampled
             scoring=auc_scorer,
             verbose=10,
-            cv=5,
+            cv=folds,
             n_jobs=-1,  # Use all cores
             random_state=int(time.time()),
         )
@@ -441,5 +443,9 @@ if save_results:
         json.dump(results_data, f, indent=4)
         print(f"Results saved to {filename}")
 
+# plot single tree
+plot_tree(model)
+plt.gcf().set_size_inches(150, 100)
+plt.show()
 
 # look into EPE

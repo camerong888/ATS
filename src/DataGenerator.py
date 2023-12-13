@@ -50,7 +50,7 @@ def addXLE(df):
     return df
 
 
-# CBOE Interest Rate 10 Year T No (^TNX)
+# Shanghai Index (^TNX)
 def addSSE(df):
     SSE_data = yf.download("000001.SS", start=startDate, end=endDate)
     df["SSE_Close"] = SSE_data["Close"]

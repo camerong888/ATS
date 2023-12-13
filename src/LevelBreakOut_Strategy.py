@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from scipy import stats
 import yfinance as yf
 
-# Hyperparameters for Price Breakout Strategy
+# Hyperparameters for Price Breakout Strategy helper function for DataGenerator
 ticker = '^GSPC'
 backcandles = 40
 window=6

@@ -21,7 +21,6 @@ percentage_split = 0.2
 
 # Choose Model Parameters:
 Regression_Model = False  # False for Classification Model, True for Regression Model
-
 gridSearch = True  # False for Random Search, True for Grid Params
 num_fits = 5000  # Num of Random Search attempts * 5
 folds = 5 # CV
@@ -208,9 +207,8 @@ feature_types = list(attributes_with_Categories.values())
 # print(f"Feature types: {feature_types}")
 # Convert categorical columns to 'category' data type
 for attr, attr_type in attributes_with_Categories.items():
-    if attr_type == "c":  # Assuming 'c' stands for categorical
+    if attr_type == "c":  
         snp500_data_set[attr] = snp500_data_set[attr].astype("category")
-# print(f"Data set: {snp500_data_set}")
 
 train, test = train_test_split(snp500_data_set, percentage_split)
 
@@ -373,17 +371,6 @@ plotting_attributes = utilized_attributes + ["Pred"]
 df_TP = pd.DataFrame(test_pred, columns=plotting_attributes)
 
 
-# plt.figure(figsize=(15, 9))
-# plt.title(f"{ticker} XGBOOST Classification Price Prediction", fontsize=18)
-# plt.plot(df_TP["Target"], label="Actual Next 10 Day Price Movement (Up = 1, Down = 0)", color="cyan")
-# plt.plot(df_TP["Pred"], label="Predicted Next 10 Day Price Movement (Up = 1, Down = 0)", color="green", alpha=1)
-# plt.xlabel("Day", fontsize=18)
-# plt.legend(loc="upper left")
-# plt.ylabel("Classification Label", fontsize=18)
-# plt.tight_layout()
-# plt.yticks([])
-# plt.show()
-
 plt.figure(figsize=(15, 9))
 plt.title(f"{ticker} XGBOOST Classification Price Prediction", fontsize=18)
 plt.plot(df_TP["Adj Close"], label="Stock Price", color="blue", alpha=0.5)
@@ -448,4 +435,3 @@ plot_tree(model)
 plt.gcf().set_size_inches(150, 100)
 plt.show()
 
-# look into EPE

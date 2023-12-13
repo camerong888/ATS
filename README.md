@@ -1,5 +1,3 @@
-Note: to visualize the Tree and are on Mac, you may need to run the command 'brew install graphviz'. 
-
 Automated Trading System (ATS)
 Description
 The Automated Trading System (ATS) is an advanced solution designed to automate trading strategies using Python. This project focuses on leveraging machine learning algorithms for financial market predictions and employs a virtual environment for effective dependency management.
